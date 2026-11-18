@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
 import { Background } from "@/components/layout/background";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Features } from "@/components/landing/features";
-import { useTranslations } from "next-intl";
 
 export default function HomePage() {
   const t = useTranslations("landing");
@@ -36,6 +39,11 @@ export default function HomePage() {
               {t("hero.subtitleAccent")}
             </span>
           </p>
+          <div className="flex justify-center">
+            <Button asChild size="lg">
+              <Link href="/dashboard">{t("hero.primaryCta")}</Link>
+            </Button>
+          </div>
         </div>
       </main>
 

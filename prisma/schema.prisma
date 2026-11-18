@@ -249,6 +249,11 @@ model User {
   touchSchedules          TouchSchedule[]
   supportTickets          SupportTicket[]
   notificationPreferences UserNotificationPreference[]
+  organizationMemberships OrganizationMember[]
+  createdOrganizations    Organization[]           @relation("OrganizationCreator")
+  sentInvitations         OrganizationInvitation[] @relation("InvitationInviter")
+  workspacePreference     WorkspacePreference?
+  auditLogs               AuditLog[]
 
   @@index([createdAt])
   @@index([deviceKeyAtSignup, createdAt])
@@ -1709,4 +1714,111 @@ model AgentToolOperation {
   @@unique([runId, toolCallId])
   @@index([runId, status])
   @@map("agent_tool_operations")
+}
+
+// AgentHub workspaces. Tenant isolation is enforced in services, not only in the UI.
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  MEMBER
+  DEVELOPER
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model Organization {
+  id                     String               @id @default(cuid())
+  name                   String
+  slug                   String               @unique
+  industry               String?
+  objectives             String[]             @default([])
+  status                 OrganizationStatus   @default(ACTIVE)
+  onboardingStep         Int                  @default(1) @map("onboarding_step")
+  onboardingCompletedAt  DateTime?            @map("onboarding_completed_at")
+  createdById            String               @map("created_by_id")
+  createdAt              DateTime             @default(now()) @map("created_at")
+  updatedAt              DateTime             @updatedAt @map("updated_at")
+  createdBy              User                 @relation("OrganizationCreator", fields: [createdById], references: [id])
+  members                OrganizationMember[]
+  invitations            OrganizationInvitation[]
+  auditLogs              AuditLog[]
+  workspacePreferences   WorkspacePreference[]
+
+  @@index([createdById])
+  @@index([status])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String           @id @default(cuid())
+  organizationId String           @map("organization_id")
+  userId         String           @map("user_id")
+  role           OrganizationRole
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId, role])
+  @@map("organization_members")
+}
+
+model OrganizationInvitation {
+  id             String           @id @default(cuid())
+  organizationId String           @map("organization_id")
+  email          String
+  role           OrganizationRole
+  token          String           @unique
+  status         InvitationStatus @default(PENDING)
+  invitedById    String?          @map("invited_by_id")
+  expiresAt      DateTime         @map("expires_at")
+  acceptedAt     DateTime?        @map("accepted_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy      User?            @relation("InvitationInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, status])
+  @@index([email, status])
+  @@map("organization_invitations")
+}
+
+model WorkspacePreference {
+  userId               String        @id @map("user_id")
+  activeOrganizationId String?       @map("active_organization_id")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganization   Organization? @relation(fields: [activeOrganizationId], references: [id], onDelete: SetNull)
+
+  @@index([activeOrganizationId])
+  @@map("workspace_preferences")
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  organizationId String?       @map("organization_id")
+  actorId        String?       @map("actor_id")
+  action         String
+  targetType     String        @map("target_type")
+  targetId       String?       @map("target_id")
+  metadata       Json?
+  createdAt      DateTime      @default(now()) @map("created_at")
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  actor          User?         @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("audit_logs")
 }

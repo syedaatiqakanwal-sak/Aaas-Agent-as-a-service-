@@ -19,6 +19,7 @@ import { repositoryRouter } from "@/server/api/routers/repository";
 import { githubRouter } from "@/server/api/routers/github";
 import { integrationDiagnosticsRouter } from "@/server/api/routers/integration-diagnostics";
 import { affiliateRouter } from "@/server/api/routers/affiliate";
+import { organizationRouter } from "@/server/api/routers/organization";
 import { telegramRouter } from "@/server/telegram/router";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
@@ -56,6 +57,8 @@ export const appRouter = createTRPCRouter({
 
   // Affiliate module
   affiliate: affiliateRouter,
+
+  organization: organizationRouter,
 
   // Telegram module
   telegram: telegramRouter,

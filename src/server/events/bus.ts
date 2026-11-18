@@ -80,6 +80,15 @@ export type EventPayload = {
     model: string;
     errorMessage?: string;
   };
+  "organization:created": {
+    organizationId: string;
+    userId: string;
+  };
+  "organization:member-joined": {
+    organizationId: string;
+    userId: string;
+    role: string;
+  };
 };
 
 type Handler<T> = (payload: T) => Promise<void>;

@@ -153,10 +153,25 @@
   },
   "landing": {
     "hero": {
-      "titleLine1": "Open-Source AI SaaS",
-      "titleLine2": "Boilerplate",
-      "subtitle": "A free framework with auth, billing, credits, payments, AI chat, workers, attribution, and anti-abuse built in.",
-      "subtitleAccent": "Bring your AI workflow. Keep the SaaS infrastructure."
+      "titleLine1": "AgentHub AI",
+      "titleLine2": "for your team",
+      "subtitle": "Create a workspace, invite your team, and run the agents already available in chat.",
+      "subtitleAccent": "Marketplace, builder, and knowledge tools are in progress and are not live yet.",
+      "primaryCta": "Open workspace"
+    },
+    "features": {
+      "eyebrow": "What works today",
+      "title": "A workspace for AI agents",
+      "titleMuted": "on the billing foundation already in this app.",
+      "summary": "Accounts, subscriptions, credits, and AI chat stay in place. This release adds organizations, roles, and a working dashboard.",
+      "workspacesTitle": "Organization workspaces",
+      "workspacesBody": "Create a workspace and invite teammates as admins, members, or developers. Access is checked on the server.",
+      "chatTitle": "AI chat",
+      "chatBody": "Open chat to use installed system agents. Execution costs and usage charts are not connected yet.",
+      "billingTitle": "Billing that already runs",
+      "billingBody": "Subscriptions, credits, and payments continue to use the existing billing system.",
+      "roadmapTitle": "Marked as planned",
+      "roadmapBody": "The agent marketplace, visual builder, knowledge base, and channel deployments are not available in this release."
     }
   },
   "dashboard": {
@@ -1378,5 +1393,163 @@
     "success": "Credits added",
     "insufficient": "No available balance for a new exchange.",
     "affiliateDisabled": "New referrals and commissions are paused. Existing balances, payout requests and history remain available."
+  }
+,
+  "agenthub": {
+    "signInTitle": "Sign in to your workspace",
+    "signInBody": "AgentHub uses the existing account system. Sign in, then create or join an organization.",
+    "signInAction": "Sign in",
+    "loadErrorTitle": "Workspace could not be loaded",
+    "loadErrorBody": "Refresh and try again.",
+    "retry": "Retry",
+    "workspaceLabel": "Workspace",
+    "noWorkspace": "No workspace yet",
+    "switchWorkspace": "Switch workspace",
+    "plannedLabel": "Later phases",
+    "planned": "Planned",
+    "suspended": "This workspace is suspended. Invites and setup changes are blocked.",
+    "nav": {
+      "overview": "Overview",
+      "agents": "My agents",
+      "conversations": "Conversations",
+      "team": "Team",
+      "billing": "Billing",
+      "profile": "Profile",
+      "settings": "Settings",
+      "admin": "Admin",
+      "marketplace": "Marketplace",
+      "builder": "Agent builder",
+      "knowledge": "Knowledge base",
+      "integrations": "Integrations",
+      "executions": "Executions",
+      "analytics": "Analytics",
+      "apiKeys": "API keys"
+    },
+    "welcome": "{name}",
+    "welcomeBody": "These numbers come from your workspace, installed agents, and chat history. Execution cost is not tracked on this screen yet.",
+    "metrics": {
+      "members": "Members",
+      "agents": "Installed agents",
+      "conversations": "Conversations",
+      "subscription": "Subscription"
+    },
+    "metricsNote": "AI credits, estimated model cost, and execution success rates will appear after usage tracking is connected. They are intentionally not shown as zero.",
+    "installedAgents": "Installed agents",
+    "openChat": "Open chat",
+    "noInstalledAgents": "No agents are installed for your user yet. Open chat to use the default assistant when one is seeded.",
+    "enabled": "Enabled",
+    "paused": "Paused",
+    "recentConversations": "Recent conversations",
+    "noConversations": "No conversations yet.",
+    "untitledConversation": "Untitled conversation",
+    "loading": "Loading...",
+    "subscriptionUnavailable": "Unavailable",
+    "noSubscription": "No active subscription",
+    "stepLabel": "Step {current} of {total}",
+    "workspaceName": "Workspace name",
+    "back": "Back",
+    "continue": "Continue",
+    "finish": "Open dashboard",
+    "saving": "Saving...",
+    "setupPendingTitle": "Workspace setup is still in progress",
+    "setupPendingBody": "An owner or admin needs to finish setup before this dashboard is ready.",
+    "noSystemAgents": "No enabled system agents are available. You can continue without installing one. Seed data can add the default assistant later.",
+    "steps": {
+      "1": {
+        "title": "Create your organization",
+        "body": "This becomes the workspace your team uses. You will be the owner."
+      },
+      "2": {
+        "title": "Select your industry",
+        "body": "This is stored on the workspace and can be changed later by an owner or admin."
+      },
+      "3": {
+        "title": "Select your objectives",
+        "body": "Choose what this workspace should help with. This does not enable extra agents by itself."
+      },
+      "4": {
+        "title": "Choose available agents",
+        "body": "Only system agents that already exist can be installed. Skipping this step is allowed."
+      },
+      "5": {
+        "title": "Confirm the workspace",
+        "body": "Review the name, then open the dashboard. The URL slug stays the same if you rename it."
+      }
+    },
+    "industries": {
+      "customer-support": "Customer support",
+      "sales": "Sales",
+      "marketing": "Marketing",
+      "finance": "Finance",
+      "healthcare": "Healthcare",
+      "real-estate": "Real estate",
+      "ecommerce": "E-commerce",
+      "human-resources": "Human resources",
+      "productivity": "Productivity",
+      "legal": "Legal",
+      "education": "Education",
+      "data-analytics": "Data and analytics",
+      "developer-tools": "Developer tools",
+      "operations": "Operations",
+      "other": "Other"
+    },
+    "objectives": {
+      "support-customers": "Support customers",
+      "qualify-leads": "Qualify leads",
+      "draft-content": "Draft content",
+      "analyze-documents": "Analyze documents",
+      "automate-operations": "Automate operations",
+      "internal-knowledge": "Answer from internal knowledge"
+    },
+    "roles": {
+      "OWNER": "Owner",
+      "ADMIN": "Admin",
+      "MEMBER": "Member",
+      "DEVELOPER": "Developer"
+    },
+    "teamTitle": "Team",
+    "teamBody": "Invite people by email. The invite link works even when email delivery is not configured.",
+    "createFirst": "Create a workspace from the overview before managing a team.",
+    "emailPlaceholder": "teammate@company.com",
+    "invite": "Invite",
+    "inviteSent": "Invitation email sent",
+    "inviteSaved": "Invitation saved. Copy the link if email is not configured.",
+    "members": "Members",
+    "invitations": "Pending invitations",
+    "noInvitations": "No pending invitations.",
+    "remove": "Remove",
+    "removeConfirm": "Remove this member from the workspace?",
+    "revoke": "Revoke",
+    "copyLink": "Copy link",
+    "linkCopied": "Invite link copied",
+    "linkCopyFailed": "Could not copy the invite link",
+    "previousPage": "Previous",
+    "nextPage": "Next",
+    "acceptTitle": "Workspace invitation",
+    "acceptInvalid": "This invitation link is incomplete.",
+    "acceptSignIn": "Sign in with the email address that received the invitation.",
+    "accepting": "Accepting invitation...",
+    "email": {
+      "subject": "Join {organization} on AgentHub AI",
+      "text": "You have been invited to {organization}. Open {url} to accept."
+    },
+    "plans": {
+      "FREE": "Free",
+      "STARTER": "Starter",
+      "PLUS": "Plus",
+      "PREMIUM": "Premium"
+    },
+    "subscriptionStatus": {
+      "NONE": "No subscription",
+      "UNDEFINED": "Unknown",
+      "INCOMPLETE": "Incomplete",
+      "INCOMPLETE_EXPIRED": "Incomplete expired",
+      "TRIALING": "Trialing",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "UNPAID": "Unpaid",
+      "PAUSED": "Paused",
+      "CANCELED": "Canceled"
+    }
   }
 }

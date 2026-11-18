@@ -153,10 +153,25 @@
   },
   "landing": {
     "hero": {
-      "titleLine1": "Build Your AI App",
-      "titleLine2": "In Record Time",
-      "subtitle": "A production-ready AI SaaS framework with auth, billing, payments, and AI chat built in.",
-      "subtitleAccent": "Focus on your core feature. We handle the rest."
+      "titleLine1": "AgentHub AI",
+      "titleLine2": "面向你的团队",
+      "subtitle": "创建工作区、邀请团队，并使用聊天里已经可用的智能体。",
+      "subtitleAccent": "市场、构建器和知识库仍在开发中，当前版本还不能使用。",
+      "primaryCta": "打开工作区"
+    },
+    "features": {
+      "eyebrow": "当前可用",
+      "title": "面向 AI 智能体的工作区",
+      "titleMuted": "建立在应用已有的计费能力之上。",
+      "summary": "账户、订阅、积分和 AI 聊天保持不变。这个版本新增组织、角色和可用的工作台。",
+      "workspacesTitle": "组织工作区",
+      "workspacesBody": "创建工作区，并邀请管理员、成员或开发者。权限在服务端校验。",
+      "chatTitle": "AI 聊天",
+      "chatBody": "打开聊天即可使用已安装的系统智能体。执行成本和用量图表尚未接入。",
+      "billingTitle": "已经运行的计费",
+      "billingBody": "订阅、积分和支付继续使用现有计费系统。",
+      "roadmapTitle": "标记为计划中",
+      "roadmapBody": "智能体市场、可视化构建器、知识库和渠道部署在这个版本中还不可用。"
     }
   },
   "dashboard": {
@@ -1378,5 +1393,163 @@
     "success": "积分已到账",
     "insufficient": "可用余额不足，暂时无法发起新兑换。",
     "affiliateDisabled": "新增推荐和佣金已暂停，既有余额、提现申请和历史记录仍可处理。"
+  }
+,
+  "agenthub": {
+    "signInTitle": "登录工作区",
+    "signInBody": "AgentHub 使用现有账户系统。登录后即可创建或加入组织。",
+    "signInAction": "登录",
+    "loadErrorTitle": "无法加载工作区",
+    "loadErrorBody": "请刷新后重试。",
+    "retry": "重试",
+    "workspaceLabel": "工作区",
+    "noWorkspace": "还没有工作区",
+    "switchWorkspace": "切换工作区",
+    "plannedLabel": "后续阶段",
+    "planned": "计划中",
+    "suspended": "此工作区已暂停。邀请和设置修改已被阻止。",
+    "nav": {
+      "overview": "概览",
+      "agents": "我的智能体",
+      "conversations": "对话",
+      "team": "团队",
+      "billing": "账单",
+      "profile": "资料",
+      "settings": "设置",
+      "admin": "管理后台",
+      "marketplace": "市场",
+      "builder": "智能体构建器",
+      "knowledge": "知识库",
+      "integrations": "集成",
+      "executions": "执行记录",
+      "analytics": "分析",
+      "apiKeys": "API 密钥"
+    },
+    "welcome": "{name}",
+    "welcomeBody": "这些数字来自你的工作区、已安装智能体和聊天记录。此页面尚未统计执行成本。",
+    "metrics": {
+      "members": "成员",
+      "agents": "已安装智能体",
+      "conversations": "对话",
+      "subscription": "订阅"
+    },
+    "metricsNote": "AI 积分、模型估算成本和执行成功率会在用量追踪接入后显示。这里不会把它们显示成零。",
+    "installedAgents": "已安装智能体",
+    "openChat": "打开聊天",
+    "noInstalledAgents": "你的账户还没有安装智能体。打开聊天后，如果已有默认助手种子数据，就可以使用它。",
+    "enabled": "已启用",
+    "paused": "已暂停",
+    "recentConversations": "最近对话",
+    "noConversations": "还没有对话。",
+    "untitledConversation": "未命名对话",
+    "loading": "加载中...",
+    "subscriptionUnavailable": "暂不可用",
+    "noSubscription": "没有有效订阅",
+    "stepLabel": "第 {current} 步，共 {total} 步",
+    "workspaceName": "工作区名称",
+    "back": "返回",
+    "continue": "继续",
+    "finish": "打开工作台",
+    "saving": "保存中...",
+    "setupPendingTitle": "工作区仍在设置中",
+    "setupPendingBody": "需要所有者或管理员完成设置后，工作台才会准备好。",
+    "noSystemAgents": "当前没有可安装的系统智能体。你可以跳过这一步。之后可以通过种子数据添加默认助手。",
+    "steps": {
+      "1": {
+        "title": "创建组织",
+        "body": "这会成为团队使用的工作区。你将成为所有者。"
+      },
+      "2": {
+        "title": "选择行业",
+        "body": "行业会保存在工作区上，所有者和管理员之后可以修改。"
+      },
+      "3": {
+        "title": "选择目标",
+        "body": "选择这个工作区要帮助完成的事情。仅保存目标不会自动启用额外智能体。"
+      },
+      "4": {
+        "title": "选择可用智能体",
+        "body": "只能安装已经存在的系统智能体。可以跳过这一步。"
+      },
+      "5": {
+        "title": "确认工作区",
+        "body": "检查名称后打开工作台。如果修改名称，网址标识不会跟着改变。"
+      }
+    },
+    "industries": {
+      "customer-support": "客户支持",
+      "sales": "销售",
+      "marketing": "市场营销",
+      "finance": "财务",
+      "healthcare": "医疗健康",
+      "real-estate": "房地产",
+      "ecommerce": "电子商务",
+      "human-resources": "人力资源",
+      "productivity": "效率",
+      "legal": "法律",
+      "education": "教育",
+      "data-analytics": "数据与分析",
+      "developer-tools": "开发者工具",
+      "operations": "运营",
+      "other": "其他"
+    },
+    "objectives": {
+      "support-customers": "支持客户",
+      "qualify-leads": "筛选线索",
+      "draft-content": "起草内容",
+      "analyze-documents": "分析文档",
+      "automate-operations": "自动化运营",
+      "internal-knowledge": "基于内部知识回答"
+    },
+    "roles": {
+      "OWNER": "所有者",
+      "ADMIN": "管理员",
+      "MEMBER": "成员",
+      "DEVELOPER": "开发者"
+    },
+    "teamTitle": "团队",
+    "teamBody": "通过邮箱邀请成员。即使没有配置邮件发送，邀请链接仍然可用。",
+    "createFirst": "请先在概览中创建工作区，再管理团队。",
+    "emailPlaceholder": "teammate@company.com",
+    "invite": "邀请",
+    "inviteSent": "邀请邮件已发送",
+    "inviteSaved": "邀请已保存。如果没有配置邮件，请复制链接。",
+    "members": "成员",
+    "invitations": "待处理邀请",
+    "noInvitations": "没有待处理邀请。",
+    "remove": "移除",
+    "removeConfirm": "将此成员移出工作区？",
+    "revoke": "撤销",
+    "copyLink": "复制链接",
+    "linkCopied": "已复制邀请链接",
+    "linkCopyFailed": "无法复制邀请链接",
+    "previousPage": "上一页",
+    "nextPage": "下一页",
+    "acceptTitle": "工作区邀请",
+    "acceptInvalid": "这个邀请链接不完整。",
+    "acceptSignIn": "请使用收到邀请的邮箱登录。",
+    "accepting": "正在接受邀请...",
+    "email": {
+      "subject": "加入 {organization} 的 AgentHub AI 工作区",
+      "text": "你已被邀请加入 {organization}。打开 {url} 接受邀请。"
+    },
+    "plans": {
+      "FREE": "免费",
+      "STARTER": "入门",
+      "PLUS": "Plus",
+      "PREMIUM": "高级"
+    },
+    "subscriptionStatus": {
+      "NONE": "无订阅",
+      "UNDEFINED": "未知",
+      "INCOMPLETE": "未完成",
+      "INCOMPLETE_EXPIRED": "未完成且已过期",
+      "TRIALING": "试用中",
+      "ACTIVE": "有效",
+      "PAST_DUE": "逾期",
+      "UNPAID": "未支付",
+      "PAUSED": "已暂停",
+      "CANCELED": "已取消"
+    }
   }
 }
