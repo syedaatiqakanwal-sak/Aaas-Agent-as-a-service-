@@ -1,6 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+.venv/
+__pycache__/
+*.pyc
+data/chroma/
 /node_modules
 **/node_modules/
 .pnpm-store/
