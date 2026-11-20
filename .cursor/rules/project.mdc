@@ -1,0 +1,194 @@
+---
+description: Agent-as-a-Service platform — standing rules. Always apply.
+alwaysApply: true
+---
+
+# Agent-as-a-Service Platform — Project Constitution
+
+You are working on a multi-tenant Agent-as-a-Service (AaaS) SaaS platform.
+These rules override any instinct to scaffold quickly. Read them fully before any edit.
+This file is the single source of truth. If another document in the tree contradicts
+it, this file wins and you report the contradiction.
+
+## 0. CURRENT STATE (as of 2026-11-20; verify, do not assume)
+- Stack: FastAPI + SQLAlchemy 2.0 + Postgres + Chroma + Gemini. Frontend is a Vite +
+  React + TypeScript dark app in `frontend/`.
+- Phase 1 + 2 are functional: API key auth, tenant-scoped documents, tenant-scoped
+  chat sessions, retrieval, Gemini chat.
+- Phase 3 is the dark web app. Login and invalid-key paths are verified in-browser.
+  The signed-in chat screen is NOT yet verified end-to-end.
+- This working tree still shares space with an unrelated product: the Velobase
+  Harness (Prisma, Next.js, `services/`, several Dockerfiles, its own CI under
+  `.github/`). None of it is used by `app/`. Separating the two is build-order step 1,
+  IN PROGRESS. The separation happens by building a fresh repository that simply does
+  not copy those files — they are not deleted in place.
+- Once that fresh repository is the working repo, no harness artifact may ever enter
+  it. If you encounter a reference to Prisma, pnpm, Next.js, `velobase`, or a
+  `services/` directory, it is a leftover from the old tree: report it, do not build
+  on it, do not carry it forward.
+- There is NO Dockerfile for this application yet. Local dev uses a gitignored
+  `docker-compose.phase1.yml`. Do not invent a deployment pipeline unless asked.
+- Six architecture documents written for an abandoned Next.js version of this product
+  were removed from the tree because they describe a system that does not exist.
+  Do not recreate them or treat any similar document as authoritative.
+
+## 1. THE ONE RULE THAT MATTERS MOST
+There is ONE agent engine. There is NOT 60 agents' worth of code.
+
+An "agent" is a row of configuration data, not a module, not a folder, not a class.
+Adding the 61st agent must require ZERO new application code — only a new config
+record and, at most, a new entry in the tool registry.
+
+If you are ever about to create a file like `agents/customer_support_agent.py`,
+`agents/real_estate_agent.py`, or a per-agent route, STOP. You have misunderstood
+the architecture. The correct move is a new row in `agent_templates`.
+
+## 2. TENANT ISOLATION — NON-NEGOTIABLE
+2.1 Every tenant-owned table has `tenant_id UUID NOT NULL` with an index, and a
+    composite index on (`tenant_id`, primary lookup column). A `tenants` table owns
+    identity; API keys reference a tenant. Ownership is never an untyped string.
+2.2 No database query may be written without a tenant filter. Enforce this
+    structurally, not by discipline:
+    - All data access goes through repository classes that accept a `TenantContext`
+      in the constructor, and that build every query with the tenant filter applied.
+    - The owner predicate belongs IN THE SQL. Fetching a row by primary key and then
+      comparing ownership in the service layer is not acceptable: the row has already
+      been read, and a future caller will forget the check.
+    - Raw or ad-hoc queries in route handlers and services are forbidden.
+    - Where the database supports it, additionally enable Row Level Security driven
+      by a session variable set from the authenticated tenant.
+2.3 The agent catalog is split into TWO tables. This is the fix for the known bug:
+    - `agent_templates` — platform-owned, global, NO tenant_id. Seeded by migration.
+      Readable by all tenants. Writable ONLY by a platform-admin role, through a
+      separate admin router that tenant API keys cannot reach.
+    - `tenant_agents` — tenant-owned instances. Has `tenant_id`, references a
+      `template_id`, and stores config overrides, enabled state, and per-tenant
+      credentials. Tenants may only CRUD rows whose tenant_id matches their context.
+2.4 Slug uniqueness is `UNIQUE(tenant_id, slug)`, never globally unique. A global
+    unique slug both blocks legitimate names and leaks the existence of other
+    tenants' agents through constraint errors.
+2.5 A missing resource and another tenant's resource both return 404, never 403.
+    403 confirms existence.
+2.6 `tests/test_tenant_isolation.py` asserts, for EVERY tenant-owned resource, that
+    tenant A's key receives 404 for tenant B's id. This suite is a merge gate.
+
+## 3. AGENT DEFINITION CONTRACT
+Every agent template is described by this schema, validated with Pydantic (and Zod
+on the frontend). No agent may exist outside this shape.
+
+{
+  "slug": "customer-support",
+  "name": "AI Customer Support Agent",
+  "category": "support",
+  "version": 1,
+  "description": "Answers customer questions from company knowledge and escalates hard cases.",
+  "system_prompt_template": "You are a support agent for {{brand_name}}. ...",
+  "model": { "provider": "gemini", "name": "gemini-2.0-flash", "temperature": 0.3 },
+  "knowledge": { "enabled": true, "top_k": 6, "min_score": 0.35, "require_citations": true },
+  "tools": ["search_docs", "create_ticket", "escalate_to_human"],
+  "memory": { "type": "session", "window": 12 },
+  "inputs": [
+    { "key": "brand_name", "label": "Brand name", "type": "string", "required": true },
+    { "key": "tone", "label": "Tone", "type": "enum", "options": ["formal","friendly"], "default": "friendly" }
+  ],
+  "guardrails": {
+    "refuse_topics": [], "pii_redaction": true, "max_output_tokens": 1024,
+    "human_approval_required": false
+  },
+  "limits": { "max_runs_per_day": 500, "max_tokens_per_run": 8000 }
+}
+
+`system_prompt_template` placeholders are filled from the tenant's `inputs` values at
+run time. A tenant editing their agent edits input VALUES and permitted overrides —
+never the platform's template row.
+
+## 4. ENGINE RUNTIME CONTRACT
+A single `AgentRunner.run(tenant_ctx, tenant_agent_id, input, stream=True)` serves
+every agent. Pipeline, in order:
+  1. Load tenant_agent + template; merge config (template defaults <- tenant overrides).
+  2. Check quota and plan limits. Reject early with a typed error.
+  3. Create an `agent_runs` row with status `running` BEFORE any model call.
+  4. Resolve tools: only those listed in the template AND enabled for the tenant.
+  5. Retrieve knowledge if enabled — scoped to this tenant's documents only.
+  6. Render the system prompt; assemble messages with the memory window.
+  7. Call the model through an `LLMProvider` interface. Gemini is one implementation.
+     Adding another provider must not touch the engine.
+  8. Run the tool-call loop with a hard max-iteration cap (default 8).
+  9. Persist every step to `agent_run_steps`: step type, tool, args, result, tokens,
+     latency, error.
+ 10. Finalize: status, token counts, computed cost, output.
+Streaming and non-streaming share this exact path. Never fork the pipeline.
+
+## 5. TOOLS
+- A central `ToolRegistry` maps tool name -> handler + JSON schema + required scopes.
+- Every tool handler takes `TenantContext` first and may touch only that tenant's data.
+- Third-party credentials live in `tenant_integrations`, encrypted at rest with
+  envelope encryption; the key comes from the environment and is never stored in the DB.
+- Any tool with an external side effect (send email, post publicly, issue a refund,
+  write to a CRM) is marked `requires_approval` and by default writes a pending action
+  for human confirmation instead of firing.
+
+## 6. OBSERVABILITY, QUOTA, BILLING
+- `agent_runs` and `agent_run_steps` are the only source of truth for usage.
+- Quota middleware reads from those tables, never from a counter that can drift.
+- Each run records tenant_id, tenant_agent_id, tokens_in, tokens_out, cost_usd,
+  status, error_code, duration_ms.
+- Plan limits (runs/month, agents allowed, document MB, seats) live in a `plans` table
+  and are enforced in one place.
+
+## 7. CODE RULES
+- FastAPI, async, Pydantic v2, SQLAlchemy 2.0, Alembic.
+- SCHEMA CHANGES HAPPEN IN MIGRATIONS ONLY. No `create_all`, no `ALTER` or
+  `CREATE INDEX` at application startup. Startup DDL races between instances and makes
+  migrations untrustworthy.
+- Frontend: keep the existing dark app's stack and design language. Agent pages are
+  GENERATED from the agent schema. Never hand-write a page per agent.
+- Typed errors with stable machine-readable codes. No bare `except:`. No fallback that
+  reports a failure as a success.
+- No secrets in code, tests, fixtures, or compose files. `.env.example` lists only the
+  variables this application actually reads, with empty values.
+- Any operational or metrics endpoint requires an admin credential or is not mounted
+  on the public app.
+- No new dependency without stating why in the commit message.
+
+## 8. HOW YOU MUST WORK WITH ME
+8.1 AUDIT BEFORE BUILD. For every task: read the relevant existing code, report what
+    is actually there, state the gap, propose a plan, and WAIT for approval. Never
+    write code in the same turn as an audit.
+8.2 ONE STEP AT A TIME. Finish one scoped step, show the diff summary and how to
+    verify it, then stop. Do not chain steps or phases.
+8.3 NEVER CLAIM SOMETHING WORKS UNTIL IT IS EXECUTED. "Should work", "now functional",
+    and "verified" are forbidden unless you ran it and are pasting real output.
+    Untested work is reported as "written, not verified".
+8.4 If you find a second problem while fixing the first, REPORT it. Do not fix it
+    silently in the same change.
+8.5 Cite `file:line` for every claim about existing behaviour, so I can check it.
+8.6 Never run tests, commit over a failing suite, or push without being told.
+
+## 9. KNOWN DEVIATIONS (open; do not rediscover, do not silently fix)
+  D1. CRITICAL — agent catalog is not tenant-scoped. All five agent routes accept any
+      valid API key and then discard the caller identity (`_ = user_id`). Any tenant
+      can read, edit, or deactivate every agent, including the system prompt used by
+      every other tenant's chat. Fix is section 2.3.
+  D2. Live tables have no `tenant_id`. Ownership is a string `user_id` from the API key.
+  D3. Document and session loads select by primary key with no tenant predicate; the
+      service compares ownership after the fetch. Violates 2.2.
+  D4. `app/main.py` performs DDL at startup. Violates section 7.
+  D5. `agents.slug` is globally unique. Violates 2.4.
+  D6. `/api/v1/metrics` is mounted with no authentication.
+  D7. Test coverage is three health/auth tests. No agent, chat, session, ingest, or
+      cross-tenant test exists.
+
+## 10. BUILD ORDER (do not jump ahead)
+  1. Clean repository, secrets out, uncommitted work preserved.
+  2. Tenant model + `agent_templates`/`tenant_agents` split + scoped repositories +
+     isolation test suite. Closes D1–D3, D5.
+  3. Alembic adopted; startup DDL removed. Closes D4.
+  4. Engine hardening: run tracking, tool registry, provider abstraction, quota.
+  5. Agent builder UI generated from the schema.
+  6. Seed and verify the first 10 agents end-to-end with real integrations.
+  7. Marketplace listing, subscriptions, billing.
+  8. Remaining agent categories, in batches, each with a working integration.
+An agent is not listed as purchasable until its integrations are real and its
+end-to-end test passes. A marketplace of non-functional agents is worse than an
+empty one.
