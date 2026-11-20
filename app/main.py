@@ -13,7 +13,7 @@ from app.core.logger import configure_logging, get_logger
 configure_logging()
 logger = get_logger(__name__)
 
-from app.api.v1.routes import chat, documents, health, ingest, sessions
+from app.api.v1.routes import agents, chat, documents, health, ingest, sessions
 from app.api.v1.routes.metrics import setup_metrics
 from app.core.exceptions import AppException
 from app.db.base import Base
@@ -47,6 +47,7 @@ app.include_router(ingest.router, prefix=settings.API_V1_PREFIX)
 app.include_router(documents.router, prefix=settings.API_V1_PREFIX)
 app.include_router(sessions.router, prefix=settings.API_V1_PREFIX)
 app.include_router(chat.router, prefix=settings.API_V1_PREFIX)
+app.include_router(agents.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.exception_handler(AppException)
