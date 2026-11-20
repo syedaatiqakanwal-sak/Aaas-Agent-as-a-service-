@@ -20,14 +20,17 @@ def _splitter():
 
 
 def _embeddings():
-    if not settings.OPENAI_API_KEY:
+    if not settings.GEMINI_API_KEY:
         raise AppException(
-            "OPENAI_API_KEY is required to embed knowledge",
+            "GEMINI_API_KEY is required to embed knowledge",
             status_code=503,
         )
-    from langchain_openai import OpenAIEmbeddings
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-    return OpenAIEmbeddings(api_key=settings.OPENAI_API_KEY)
+    return GoogleGenerativeAIEmbeddings(
+        model="models/gemini-embedding-001",
+        google_api_key=settings.GEMINI_API_KEY,
+    )
 
 
 def _collection():

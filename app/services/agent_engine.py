@@ -42,11 +42,11 @@ def _chat_model(model_name: str):
         from langchain_anthropic import ChatAnthropic
 
         return ChatAnthropic(model=model_name, api_key=settings.ANTHROPIC_API_KEY)
-    if not settings.OPENAI_API_KEY:
-        raise AppException("OPENAI_API_KEY is required for this model", status_code=503)
-    from langchain_openai import ChatOpenAI
+    if not settings.GEMINI_API_KEY:
+        raise AppException("GEMINI_API_KEY is required for this model", status_code=503)
+    from langchain_google_genai import ChatGoogleGenerativeAI
 
-    return ChatOpenAI(model=model_name, api_key=settings.OPENAI_API_KEY)
+    return ChatGoogleGenerativeAI(model=model_name, google_api_key=settings.GEMINI_API_KEY)
 
 
 async def retrieve(state: AgentState) -> dict:
@@ -94,10 +94,24 @@ def get_agent():
     return _agent
 
 
+def _message_text(content: object) -> str:
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts: list[str] = []
+        for part in content:
+            if isinstance(part, str):
+                parts.append(part)
+            elif isinstance(part, dict) and part.get("type") == "text":
+                parts.append(str(part.get("text") or ""))
+            elif getattr(part, "type", "text") == "text" and getattr(part, "text", None):
+                parts.append(str(part.text))
+        return "".join(parts).strip()
+    return str(content)
+
+
 def reply_text(messages: list) -> str:
     for message in reversed(messages):
         if isinstance(message, AIMessage) and message.content and not message.tool_calls:
-            if isinstance(message.content, str):
-                return message.content
-            return str(message.content)
+            return _message_text(message.content)
     return ""

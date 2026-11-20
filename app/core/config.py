@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     API_KEYS: str
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     CHROMA_PATH: str = "./data/chroma"
     REDIS_URL: str = "redis://localhost:6379/0"
 

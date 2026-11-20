@@ -15,7 +15,7 @@ class Agent(Base):
     slug: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     system_prompt: Mapped[str] = mapped_column(Text, nullable=False)
-    model: Mapped[str] = mapped_column(String(100), nullable=False, default="gpt-4o")
+    model: Mapped[str] = mapped_column(String(100), nullable=False, default="gemini-3.8-flash")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

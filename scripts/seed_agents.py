@@ -14,7 +14,7 @@ SEED_AGENTS = [
     {
         "slug": "customer-support",
         "name": "Customer Support Agent",
-        "model": "gpt-4o",
+        "model": "gemini-3.8-flash",
         "system_prompt": (
             "You are a polite customer support agent. Answer from the retrieved knowledge. "
             "If the knowledge does not contain the answer, say that you do not know. "
@@ -24,7 +24,7 @@ SEED_AGENTS = [
     {
         "slug": "lead-generation",
         "name": "Lead Generation Agent",
-        "model": "gpt-4o",
+        "model": "gemini-3.8-flash",
         "system_prompt": (
             "You are a lead generation agent. Ask one qualifying question at a time. "
             "Collect the person's name and email before you close the conversation. "
@@ -34,7 +34,7 @@ SEED_AGENTS = [
     {
         "slug": "appointment-booking",
         "name": "Appointment Booking Agent",
-        "model": "gpt-4o",
+        "model": "gemini-3.8-flash",
         "system_prompt": (
             "You are an appointment booking agent. Ask for the reason and a preferred time, "
             "then call book_appointment. You do not have a live calendar; the tool only records the request. "

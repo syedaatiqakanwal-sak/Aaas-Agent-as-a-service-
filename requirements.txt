@@ -16,6 +16,7 @@ langchain
 langchain-openai
 langchain-anthropic
 langchain-community
+langchain-google-genai
 langgraph
 chromadb
 tiktoken
