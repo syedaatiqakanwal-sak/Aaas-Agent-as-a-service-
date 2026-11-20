@@ -13,8 +13,16 @@ it, this file wins and you report the contradiction.
 ## 0. CURRENT STATE (as of 2026-11-20; verify, do not assume)
 - Stack: FastAPI + SQLAlchemy 2.0 + Postgres + Chroma + Gemini. Frontend is a Vite +
   React + TypeScript dark app in `frontend/`.
-- Phase 1 + 2 are functional: API key auth, tenant-scoped documents, tenant-scoped
-  chat sessions, retrieval, Gemini chat.
+- Phase 1 + 2 are PARTLY verified. Verified by execution: API key auth (valid and
+  invalid), health, session creation, document scoping, and the embedding call
+  (`gemini-embedding-001:batchEmbedContents` returned 200).
+- The Gemini CHAT path has never been observed to succeed. On 2026-11-20 direct
+  single-shot calls returned: `gemini-3.8-flash` no response at 30s,
+  `gemini-3.5-flash` no response at 30s, `gemini-3.6-flash` 503 in 2.4s,
+  `gemini-2.5-flash` 404 (no longer available to this key, Google's message directs
+  to `gemini-3.8-flash`). Auth and connectivity are fine; this is provider capacity.
+  Never describe chat as working until a successful `generateContent` is observed
+  and recorded.
 - Phase 3 is the dark web app. Login and invalid-key paths are verified in-browser.
   The signed-in chat screen is NOT yet verified end-to-end.
 - This working tree still shares space with an unrelated product: the Velobase
@@ -204,6 +212,11 @@ Streaming and non-streaming share this exact path. Never fork the pipeline.
   D14. `scripts/seed_agents.py` prints `seeded 0 agents` when rows already exist,
        which reads as a failure. Output should distinguish "created" from
        "already present".
+  D15. The application depends on Redis (`app/services/memory_service.py`) but
+       `docker-compose.phase1.yml` defines only the database. Redis has been
+       running as an orphan container from an earlier stack, so local development
+       works by accident and will break on the next machine restart. The compose
+       file must declare every service the app requires.
 
 ## 10. BUILD ORDER (do not jump ahead)
   1. Clean repository, secrets out, uncommitted work preserved.
