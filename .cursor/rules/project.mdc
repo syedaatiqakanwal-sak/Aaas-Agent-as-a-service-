@@ -83,7 +83,7 @@ on the frontend). No agent may exist outside this shape.
   "version": 1,
   "description": "Answers customer questions from company knowledge and escalates hard cases.",
   "system_prompt_template": "You are a support agent for {{brand_name}}. ...",
-  "model": { "provider": "gemini", "name": "gemini-2.0-flash", "temperature": 0.3 },
+  "model": { "provider": "gemini", "name": "gemini-3.8-flash", "temperature": 0.3 },
   "knowledge": { "enabled": true, "top_k": 6, "min_score": 0.35, "require_citations": true },
   "tools": ["search_docs", "create_ticket", "escalate_to_human"],
   "memory": { "type": "session", "window": 12 },
@@ -178,6 +178,18 @@ Streaming and non-streaming share this exact path. Never fork the pipeline.
   D6. `/api/v1/metrics` is mounted with no authentication.
   D7. Test coverage is three health/auth tests. No agent, chat, session, ingest, or
       cross-tenant test exists.
+  D8. The chat model ID is duplicated across five locations
+      (`app/db/models/agent.py`, `app/schemas/agent.py`, `scripts/seed_agents.py`
+      x3). The default belongs in config in exactly one place; per-agent values
+      belong in the agent record.
+  D9. The embedding model is hardcoded in `app/services/rag_service.py`. Changing
+      an embedding model invalidates every stored vector, so it must come from
+      config AND be recorded alongside each collection so existing vectors can be
+      identified and re-embedded. Also: model IDs are stored bare
+      (`gemini-3.8-flash`) in the agent record but prefixed
+      (`models/gemini-embedding-001`) in the RAG service. Pick one convention.
+  D10. No execution evidence exists for the Gemini chat path. No test, script, or
+      log records a successful `generateContent` response.
 
 ## 10. BUILD ORDER (do not jump ahead)
   1. Clean repository, secrets out, uncommitted work preserved.
