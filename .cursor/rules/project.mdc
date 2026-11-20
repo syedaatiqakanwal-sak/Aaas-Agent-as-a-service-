@@ -190,6 +190,20 @@ Streaming and non-streaming share this exact path. Never fork the pipeline.
       (`models/gemini-embedding-001`) in the RAG service. Pick one convention.
   D10. No execution evidence exists for the Gemini chat path. No test, script, or
       log records a successful `generateContent` response.
+  D11. A provider error does not surface to the caller. A transient Gemini 503 left
+       a chat request hanging past 120 seconds with no timeout, no retry cap
+       reaching the client, and no typed error. Every provider call needs an
+       explicit deadline and must fail fast with a typed error.
+  D12. API keys live in the `API_KEYS` environment setting as `api-key:user_id`
+       pairs. There is no keys table, so adding a customer requires editing the
+       environment and restarting. Self-serve signup, key rotation, and multiple
+       keys per tenant are all impossible. The tenant migration must introduce
+       `tenants` and `api_keys` tables together.
+  D13. `user_sessions.agent_id` stores the agent SLUG as a string, not the agent's
+       UUID, and there is no foreign key. Renaming a slug orphans existing sessions.
+  D14. `scripts/seed_agents.py` prints `seeded 0 agents` when rows already exist,
+       which reads as a failure. Output should distinguish "created" from
+       "already present".
 
 ## 10. BUILD ORDER (do not jump ahead)
   1. Clean repository, secrets out, uncommitted work preserved.
